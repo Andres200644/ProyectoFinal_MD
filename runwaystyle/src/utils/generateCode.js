@@ -1,7 +1,5 @@
-const crypto = require('crypto');
+import { v4 as uuidv4 } from 'uuid';
 
-const generateCode = () => {
-  return crypto.randomBytes(4).toString('hex').toUpperCase();
+export const generateUniqueCode = () => {
+  return uuidv4();
 };
-
-module.exports = generateCode;

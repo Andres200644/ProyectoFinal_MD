@@ -1,9 +1,12 @@
-const express = require('express');
-const { getProducts, addProduct } = require('../controllers/productController');
-const { ensureAuth, ensureAdmin } = require('../middlewares/authMiddleware');
+import express from 'express';
+import { getProducts, getProductById, createProduct } from '../controllers/productController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { roleMiddleware } from '../middlewares/roleMiddleware.js';
+
 const router = express.Router();
 
-router.get('/', ensureAuth, getProducts);
-router.post('/add', ensureAuth, ensureAdmin, addProduct);
+router.get('/', getProducts);
+router.get('/:id', getProductById);
+router.post('/', authMiddleware, roleMiddleware('admin'), createProduct);
 
-module.exports = router;
+export default router;

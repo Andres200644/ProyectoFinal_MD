@@ -1,39 +1,34 @@
-const Cart = require('../models/Cart');
-const Product = require('../models/Product');
+import Cart from '../models/Cart.js';
 
-exports.getCart = async (req, res) => {
-  const userId = req.user.id;
-  const cart = await Cart.findOne({ user: userId }).populate('items.product');
-  res.render('cart', { cart });
+export const getCart = async (req, res) => {
+  try {
+    const cart = await Cart.findOne({ userId: req.user.id }).populate('products.productId');
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-exports.addToCart = async (req, res) => {
-  const { productId, quantity } = req.body;
-  const userId = req.user.id;
-  let cart = await Cart.findOne({ user: userId });
+export const addToCart = async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    let cart = await Cart.findOne({ userId: req.user.id });
 
-  if (!cart) {
-    cart = new Cart({ user: userId, items: [] });
+    if (!cart) {
+      cart = new Cart({ userId: req.user.id, products: [] });
+    }
+
+    const productIndex = cart.products.findIndex(p => p.productId.toString() === productId);
+
+    if (productIndex > -1) {
+      cart.products[productIndex].quantity += quantity;
+    } else {
+      cart.products.push({ productId, quantity });
+    }
+
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  const itemIndex = cart.items.findIndex((item) => item.product == productId);
-  if (itemIndex > -1) {
-    cart.items[itemIndex].quantity += quantity;
-  } else {
-    cart.items.push({ product: productId, quantity });
-  }
-
-  await cart.save();
-  res.redirect('/cart');
-};
-
-exports.removeFromCart = async (req, res) => {
-  const { productId } = req.body;
-  const userId = req.user.id;
-
-  const cart = await Cart.findOne({ user: userId });
-  cart.items = cart.items.filter((item) => item.product != productId);
-  await cart.save();
-
-  res.redirect('/cart');
 };

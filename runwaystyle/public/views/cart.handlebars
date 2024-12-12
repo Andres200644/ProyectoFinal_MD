@@ -1,6 +1,18 @@
-<h1>Tu Carrito</h1>
-<ul>
-  {{#each cart.items}}
-  <li>{{this.product.name}} x {{this.quantity}}</li>
-  {{/each}}
-</ul>
+<section>
+  <h2>Carrito de Compras</h2>
+  <div class="cart">
+    {{#if cart.products.length}}
+      <ul>
+        {{#each cart.products}}
+          <li>
+            {{this.productId.name}} - Cantidad: {{this.quantity}} - Precio: ${{this.productId.price}}
+          </li>
+        {{/each}}
+      </ul>
+      <p><strong>Total:</strong> ${{cart.totalPrice}}</p>
+      <button>Realizar Compra</button>
+    {{else}}
+      <p>El carrito está vacío.</p>
+    {{/if}}
+  </div>
+</section>

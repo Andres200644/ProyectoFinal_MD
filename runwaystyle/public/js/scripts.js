@@ -1,22 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const cartButtons = document.querySelectorAll('.add-to-cart');
+    console.log('Frontend scripts loaded.');
   
-    cartButtons.forEach((button) => {
-      button.addEventListener('click', async (event) => {
-        const productId = event.target.dataset.id;
+    // Ejemplo de evento para un botón de agregar al carrito
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    addToCartButtons.forEach((button) => {
+      button.addEventListener('click', async (e) => {
+        const productId = e.target.dataset.productId; // Obtiene el ID del producto
+        console.log(`Producto agregado al carrito: ${productId}`);
+  
         try {
-          const response = await fetch('/cart/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, quantity: 1 }),
+          // Petición al backend para agregar el producto al carrito
+          const response = await fetch('/api/cart', {
+            method: 'POST', // Método POST para agregar al carrito
+            headers: {
+              'Content-Type': 'application/json', // Especificamos el tipo de contenido
+            },
+            body: JSON.stringify({ productId }), // Enviamos el ID del producto en el cuerpo
           });
+  
           if (response.ok) {
-            alert('Producto agregado al carrito');
+            const data = await response.json();
+            console.log('Respuesta del servidor:', data);
+  
+            // Muestra un mensaje al usuario
+            alert(`Producto agregado al carrito: ${data.product.name}`);
           } else {
-            alert('Hubo un error al agregar el producto');
+            // Manejo de errores si la respuesta no es satisfactoria
+            const error = await response.json();
+            console.error('Error al agregar al carrito:', error);
+            alert(`Error: ${error.message}`);
           }
         } catch (error) {
-          console.error(error);
+          // Manejo de errores de conexión u otros
+          console.error('Error en la petición al servidor:', error);
+          alert('Hubo un error al agregar el producto al carrito. Intenta nuevamente.');
         }
       });
     });
